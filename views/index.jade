@@ -1,5 +1,11 @@
 extends layout
 
 block content
-  h1= title
-  p Welcome to #{title}
+  h1 Buzzwords As A Service
+  p This silly service provides buzzwords!  Currently available options are:
+  ul(style="line-height: 150%")
+    li <a href="/random" style="font-family: monospace; color: blue; text-decoration: none">/random</a>: completely random buzzword
+    each val, key in buzzwords
+      li.
+       <a href="/#{key}" style="font-family: monospace; color: blue; text-decoration: none">/#{key}</a>: #{val.name}
+  p All buzzwords were shamelessly stolen from <a href='http://en.wikipedia.org/wiki/List_of_buzzwords'>Wikipedia</a>.

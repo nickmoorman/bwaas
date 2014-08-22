@@ -1,3 +1,4 @@
+// Define buzzwords.  Shamelessly stolen from Wikipedia: http://en.wikipedia.org/wiki/List_of_buzzwords
 exports.buzzwords = {
   "business": {
     "name": "Business, sales and marketing",

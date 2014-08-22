@@ -5,7 +5,6 @@
 
 var express = require('express');
 var routes = require('./routes');
-var user = require('./routes/user');
 var http = require('http');
 var path = require('path');
 
@@ -28,20 +27,33 @@ if ('development' == app.get('env')) {
   app.use(express.errorHandler());
 }
 
-app.get('/', routes.index);
-app.get('/random', function(req, res) {
-  var buzzwords = require('./buzzwords.js').buzzwords;
-  var getRandom = function(obj) {
-    var keys = Object.keys(obj);
+// Load buzzwords
+var buzzwords = require('./buzzwords.js').buzzwords;
+// Define function to get sub-object from object
+// Stolen from: http://stackoverflow.com/a/15106541
+function getRandom(obj) {
+  var keys = Object.keys(obj);
 
-    return obj[keys[keys.length * Math.random() << 0]];
-  };
-  var randomSet = getRandom(buzzwords);
-  var category = randomSet['name'];
-  var word = getRandom(randomSet['words']);
+  return obj[keys[keys.length * Math.random() << 0]];
+};
+
+app.get('/', function(req, res) {
+  res.render('index', { buzzwords: buzzwords });
+});
+app.get('/:cat', function(req, res) {
+  var cat = req.params.cat;
+  var buzzwordSet;
+  if (cat in buzzwords) {
+    buzzwordSet = buzzwords[cat];
+  } else {
+    buzzwordSet = getRandom(buzzwords);
+  }
+
+  var category = buzzwordSet['name'];
+  var word = getRandom(buzzwordSet['words']);
 
   res.render('word', { word: word, category: category });
-})
+});
 
 http.createServer(app).listen(app.get('port'), function(){
   console.log('Express server listening on port ' + app.get('port'));
