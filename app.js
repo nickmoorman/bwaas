@@ -19,8 +19,8 @@ app.use(express.logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded());
 app.use(express.methodOverride());
-app.use(app.router);
 app.use(express.static(path.join(__dirname, 'public')));
+app.use(app.router);
 
 // development only
 if ('development' == app.get('env')) {
@@ -40,8 +40,21 @@ function getRandom(obj) {
 app.get('/', function(req, res) {
   res.render('index', { buzzwords: buzzwords });
 });
-app.get('/:cat', function(req, res) {
+app.get('/:cat/:format?', function(req, res) {
   var cat = req.params.cat;
+  var format = req.params.format;
+
+  // Return JSON'd index
+  if (cat == 'index' && format == 'json') {
+    var index = {
+      'random': 'Completely random buzzword'
+    };
+    for (var key in buzzwords) {
+      index[key] = buzzwords[key]['name'];
+    }
+    res.json(index);
+  }
+
   var buzzwordSet;
   if (cat in buzzwords) {
     buzzwordSet = buzzwords[cat];
@@ -49,10 +62,16 @@ app.get('/:cat', function(req, res) {
     buzzwordSet = getRandom(buzzwords);
   }
 
-  var category = buzzwordSet['name'];
-  var word = getRandom(buzzwordSet['words']);
+  var json = {
+    category: buzzwordSet['name'],
+    word: getRandom(buzzwordSet['words'])
+  };
 
-  res.render('word', { word: word, category: category });
+  if (format && format == 'json') {
+    res.json(json);
+  } else {
+    res.render('word', json);
+  }
 });
 
 http.createServer(app).listen(app.get('port'), function(){
