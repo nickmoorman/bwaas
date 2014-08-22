@@ -29,7 +29,19 @@ if ('development' == app.get('env')) {
 }
 
 app.get('/', routes.index);
-app.get('/users', user.list);
+app.get('/random', function(req, res) {
+  var buzzwords = require('./buzzwords.js').buzzwords;
+  var getRandom = function(obj) {
+    var keys = Object.keys(obj);
+
+    return obj[keys[keys.length * Math.random() << 0]];
+  };
+  var randomSet = getRandom(buzzwords);
+  var category = randomSet['name'];
+  var word = getRandom(randomSet['words']);
+
+  res.render('word', { word: word, category: category });
+})
 
 http.createServer(app).listen(app.get('port'), function(){
   console.log('Express server listening on port ' + app.get('port'));
